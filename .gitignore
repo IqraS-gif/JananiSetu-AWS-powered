@@ -11,6 +11,12 @@ build/
 
 # Subproject ignores are handled by their own .gitignore files
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
 # Firebase / Secrets
 credentials.json
 *-firebase-adminsdk-*.json
