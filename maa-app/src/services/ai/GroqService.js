@@ -8,6 +8,7 @@ const _shouldRotate = (status) => status === 401 || status === 403 || status ===
 
 const GROQ_API_KEY = GROQ_KEYS[0] || ''; // Managed via .env for security
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'openai/gpt-oss-120b';
 
 async function fetchGroq(url, options = {}) {
     if (GROQ_KEYS.length === 0) {
@@ -98,7 +99,7 @@ export async function getDynamicInsights(foodItems, nutritionTotals) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: GROQ_MODEL,
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.5,
                 response_format: { type: "json_object" }
@@ -185,7 +186,7 @@ export async function getAIFoodNutrition(text, excludedItems = []) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: GROQ_MODEL,
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.1,
                 response_format: { type: 'json_object' }
@@ -227,7 +228,7 @@ export async function extractFoodNames(text) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: GROQ_MODEL,
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0,
                 response_format: { type: 'json_object' }
@@ -273,7 +274,7 @@ export async function verifyDirection(targetDir, userSpeech) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: GROQ_MODEL,
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0,
             }),
@@ -335,7 +336,7 @@ export async function extractHealthDataFromReport(base64Image) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+                model: GROQ_MODEL,
                 messages: [
                     {
                         role: 'user',
@@ -415,7 +416,7 @@ export async function getAIFoodItemsFromText(text) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: GROQ_MODEL,
                 messages: [{ role: 'user', content: prompt }],
                 temperature: 0.1,
                 response_format: { type: 'json_object' }

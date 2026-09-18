@@ -25,6 +25,8 @@ function rotateGemini() { _geminiIdx = (_geminiIdx + 1) % Math.max(GEMINI_KEYS.l
 function rotateSarvam() { _sarvamIdx = (_sarvamIdx + 1) % Math.max(SARVAM_KEYS.length, 1); console.warn(`[KeyRotate] Sarvam → key ${_sarvamIdx}`); }
 function rotateGroq() { _groqIdx = (_groqIdx + 1) % Math.max(GROQ_KEYS.length, 1); console.warn(`[KeyRotate] Groq   → key ${_groqIdx}`); }
 
+const GROQ_MODEL = 'openai/gpt-oss-120b';
+
 /** Returns true if the HTTP status indicates a key should be rotated */
 const _shouldRotate = (status) => status === 401 || status === 403 || status === 429;
 
@@ -674,7 +676,7 @@ RULES:
                         method: 'POST',
                         headers: { 'api-subscription-key': key, 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: 'sarvam-30b',
+                            model: 'sarvam-105b',
                             messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...formattedMessages],
                             temperature: 0.6,
                         })
@@ -715,7 +717,7 @@ RULES:
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: 'llama-3.3-70b-versatile',
+                    model: GROQ_MODEL,
                     messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...formattedMessages],
                     temperature: 0.7,
                 })
@@ -739,7 +741,7 @@ RULES:
 
             // Tier 1: Sarvam Chat
             try {
-                console.log(`[Chat Service] Tier 1: Attempting Sarvam Chat (sarvam-30b) with dialect: ${dialect}...`);
+                console.log(`[Chat Service] Tier 1: Attempting Sarvam Chat (sarvam-105b) with dialect: ${dialect}...`);
                 return await callSarvamChatAPI(messages, language, dialect);
             } catch (sarvamError) {
                 console.warn("[Chat Service] Tier 1 failed, trying Tier 2 (Gemini):", sarvamError.message || sarvamError);
@@ -1071,7 +1073,7 @@ Return ONLY a JSON object:
             messages.push({ role: "user", content: userPrompt });
 
             const payload = {
-                model: "llama-3.3-70b-versatile",
+                model: GROQ_MODEL,
                 messages: messages,
                 temperature: 0.2,
             };
@@ -1111,7 +1113,7 @@ Return ONLY a JSON object:
             });
 
             const payload = {
-                model: "meta-llama/llama-4-scout-17b-16e-instruct",
+                model: GROQ_MODEL,
                 messages: messages,
                 temperature: 0.2,
             };
@@ -1239,7 +1241,7 @@ Expected Output Format:
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            model: "llama-3.3-70b-versatile",
+                            model: GROQ_MODEL,
                             messages: [
                                 { role: "system", content: prompt },
                                 { role: "user", content: `User command: "${transcript}"` }

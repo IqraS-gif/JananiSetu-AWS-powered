@@ -1,9 +1,12 @@
 /**
  * AIChatbotScreen.js
- * React Native AI Orb — featuring actual Gemini Voice Chat.
- *   • Voice to Text via Gemini
- *   • Empathetic Chat generation via Gemini
- *   • Text-to-Speech playback
+ * React Native AI Orb — powered by AWS Strands Agents SDK.
+ *   • Voice to Text via Sarvam / Gemini STT (unchanged)
+ *   • Empathetic Chat generation via AWS Strands Agent + Amazon Bedrock (Claude)
+ *   • Text-to-Speech playback (unchanged)
+ *
+ * The chat backend is now a FastAPI server running the Strands Agent SDK.
+ * All UI, animations, recording, and TTS logic remain identical.
  */
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -28,9 +31,12 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system/legacy';
 import { useT } from '../../i18n/useT';
+import { useUser } from '../../context/UserContext';
 
 // AI Services
-import { generateMultimodalPregnancyChatResponse } from '../../services/ai/GeminiService';
+// Chat is now powered by AWS Strands Agents SDK via a local FastAPI backend.
+// Voice transcription (STT) still uses the existing Sarvam/Gemini/Groq chain inside StrandsAgentService.
+import { generateMultimodalChatWithStrands } from '../../services/ai/StrandsAgentService';
 import { playTextToSpeech, stopTextToSpeech } from '../../services/TextToSpeechService';
 
 const { width: SW } = Dimensions.get('window');
@@ -188,6 +194,7 @@ function ChatBubble({ role, text, delay, isRunning }) {
 export default function AIChatbotScreen({ navigation }) {
     const { language } = useT();
     const langCode = language;
+    const { user } = useUser(); // for passing user_id to the Strands Agent for personalised responses
 
     const getWelcomeMessage = (lang) => {
         const welcomes = {
@@ -307,12 +314,19 @@ export default function AIChatbotScreen({ navigation }) {
 
             if (!uri) throw new Error("Could not retrieve audio location.");
 
-            // 1. Send Audio and History to Gemini in ONE API CALL!
+            // 1. Read audio as base64
             const base64 = await FileSystem.readAsStringAsync(uri, { encoding: 'base64' });
 
             setIsProcessing(true);
-            // Gets both what the user said, and the empathetic AI response
-            const { transcript, response } = await generateMultimodalPregnancyChatResponse(messages, base64, langCode);
+            // 2. Transcribe voice → send text to AWS Strands Agent backend
+            //    STT: Sarvam / Gemini / Groq (unchanged, inside StrandsAgentService)
+            //    Chat: AWS Strands Agent + Amazon Bedrock (Claude Sonnet 3.5 v2)
+            const { transcript, response } = await generateMultimodalChatWithStrands(
+                messages,
+                base64,
+                langCode,
+                user?.id || null,
+            );
 
             if (!transcript || transcript === 'NO_SPEECH') {
                 setIsProcessing(false);
