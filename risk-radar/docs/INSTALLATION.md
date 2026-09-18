@@ -8,6 +8,10 @@ Follow these steps to set up the Risk Radar project locally.
 *   Python (3.8+)
 *   MongoDB (v4+)
 
+
+
+
+
 ## Backend Setup
 1.  Navigate to the `backend` directory:
     ```bash
