@@ -1,0 +1,41 @@
+{
+  "boot-source": {
+    "kernel_image_path": "/var/lib/firecracker/vmlinux-5.10.bin",
+    "boot_args": "console=ttyS0 reboot=k panic=1 pci=off init=/init quiet"
+  },
+  "drives": [
+    {
+      "drive_id": "rootfs",
+      "path_on_host": "/var/lib/firecracker/rootfs.ext4",
+      "is_root_device": true,
+      "is_read_only": true
+    },
+    {
+      "drive_id": "scratch_ephemeral",
+      "path_on_host": "/tmp/microvm-scratch.ext4",
+      "is_root_device": false,
+      "is_read_only": false
+    }
+  ],
+  "machine-config": {
+    "vcpu_count": 1,
+    "mem_size_mib": 128,
+    "smt": false,
+    "track_dirty_pages": false
+  },
+  "network-interfaces": [],
+  "metrics": {
+    "metrics_path": "/tmp/firecracker-metrics.fifo"
+  },
+  "mmds-config": {
+    "version": "V2"
+  },
+  "isolation": {
+    "technology": "AWS Firecracker microVM",
+    "hypervisor": "KVM",
+    "jailer_uid": 10001,
+    "jailer_gid": 10001,
+    "cgroup_memory_limit_mib": 128,
+    "seccomp_filter": "default_strict"
+  }
+}
